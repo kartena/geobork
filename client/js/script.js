@@ -7,7 +7,6 @@
   ,getGeos = function () {
     $.ajax({
       type: 'GET'
-      ,contentType: "application/json"
       ,url: '/geo'
       ,success: function (data) {
         var str = '';
@@ -57,5 +56,5 @@
     });
   });
 
-  $(document).ready(getGeos);
+  //$(document).ready(getGeos);
 })(jQuery);

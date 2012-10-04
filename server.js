@@ -1,3 +1,3 @@
 require('coffee-script')
-require('./geobork');
+require('./js/geobork');
 

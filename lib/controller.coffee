@@ -1,7 +1,6 @@
-mongoose = require 'mongoose'
-model = require './model'
-Geo = mongoose.model 'Geo'
-db = mongoose.connect 'mongodb://localhost/test'
+schema = require './model'
+db = require('mongoose').connect 'mongodb://localhost/geobork'
+Geo = db.model 'Geo', schema.Geo
 
 exports.createGeo = (geo, callback) ->
   new Geo(geo).save callback
@@ -9,6 +8,5 @@ exports.createGeo = (geo, callback) ->
 exports.getGeo = (id, callback) ->
   Geo.findById id, callback
 
-exports.getGeos = (max, callback) ->
-  Geo.where().sort('created', -1).limit(max).run callback
-
+exports.getGeos = (callback, max) ->
+  Geo.find().sort({created: -1}).limit(20).exec callback

@@ -9,11 +9,11 @@
   }
   ,"dependencies": {
     "mongoose": "*"
-    ,"express": "*"
+    ,"connect": "*"
     ,"coffee-script": "*"
   }
   ,"engines": {
-    "node": "0.6.x"
+    "node": "~0.8"
   }
-  ,"files": ["server.js", "geobork.coffee", "lib/", "LICENSE", "README.md"]
+  ,"files": ["server.js", "js/", "LICENSE", "README.md"]
 }

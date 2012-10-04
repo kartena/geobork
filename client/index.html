@@ -9,35 +9,39 @@
 
   <title>Geo Borker Test Client</title>
   <meta name="description" content="Geolocation logger">
-  <meta name="author" content="icetan">
+  <meta name="author" content="Christopher Fredén">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="css/style.css?v=1">
-  <link rel="stylesheet" media="handheld" href="css/handheld.css?v=1">
-  <script src="js/libs/modernizr-1.7.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" media="handheld" href="css/handheld.css">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.ie.css" />
+  <![endif]-->
+  <style>
+  </style>
+  <script src="js/modernizr-1.7.min.js"></script>
 </head>
 
 <body>
-  <div id="container">
-    <div id="content"> 
-      <div class="not-supported-msg">
-        Your browser does not support the Geolocation API.
-      </div>
-      <a class="big-button send-position" href="#">Log Position</a>
-      <div class="geos"></div>
+  <div id="map"></div>
+  <div id="panel">
+    <div class="not-supported-msg">
+      Your browser does not support the Geolocation API.
     </div>
+    <a id="start-position" class="big-button" href="#">
+      Start logging as
+    </a>
+    <input id="device-name" type="text" />
+    <a id="stop-position" class="big-button" href="#">
+      Stop logging
+    </a>
+    <div class="geos"></div>
   </div>
-  <!-- eo #container -->
-  <div id="footer">
-  </div>
-
-  <script src="js/libs/jquery-1.7.1.min.js"></script>
-
-  <!-- scripts -->
-  <script src="js/libs/json2.min.js"></script>
-  <script src="js/script.js"></script>
-  <!-- end scripts -->
-
+  <script src="socket.io/socket.io.js"></script>
+  <script src="js/zepto.js"></script>
+  <script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
