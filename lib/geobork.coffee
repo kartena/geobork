@@ -14,7 +14,7 @@ app.use express.bodyParser()
 
 # TODO: move to configuration
 app.use express.logger 'dev'
-app.use express.static 'client'
+app.use express.static process.argv[3] or 'client'
 
 app.use '/geo*', (req, res, next) ->
   res.header 'Access-Control-Allow-Origin', '*'
@@ -57,5 +57,5 @@ io.sockets.on 'connection', (socket) ->
     controller.createGeo map.geoJsonToDoc(geoJson), (err, doc) ->
       socket.broadcast.emit 'new geo', map.docToGeoJson(doc)
 
-server.listen 8013
+server.listen parseInt(process.argv[2] or 8013)
 process.on 'exit', -> server.close()
