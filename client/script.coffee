@@ -50,6 +50,7 @@ onPosition = (position) ->
         name: deviceName
         accuracy: position.accuracy
         heading: position.heading
+        timestamp: Date.now()
         hdop: -1
         web: true
     lastSentPosition = position

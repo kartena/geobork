@@ -11,5 +11,5 @@ exports.getGeo = (id, callback) ->
 exports.getGeos = (callback, opt) ->
   {find, sort} = opt if opt?
   q = Geo.find find
-  q = q.sort sort if sort?
+  q = q.sort (if sort? then sort else 'created')
   q.exec callback

@@ -132,6 +132,10 @@ p, hr {
   box-sizing: border-box;
 }
 
+.leaflet-marker-icon {
+  -webkit-transition-duration: 1s;
+}
+
 /*
  * Helpers
  */
