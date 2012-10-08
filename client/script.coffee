@@ -26,7 +26,7 @@ socket.on 'new geo', (geoJson) ->
 login = (name) ->
   deviceName = name
   localStorage.setItem 'device-name', name
-loggedIn = -> return deviceName?
+loggedIn = -> not not deviceName
 
 cacheInterval = null
 $('#start-position').click -> login $('#device-name').val()
@@ -75,7 +75,7 @@ updateHistory = ->
     meta = line.lastFeature.properties
     if not line._point?
       icon = L.icon
-        iconUrl: 'arrow.png'
+        iconUrl: 'img/arrow.png'
         iconSize: [42, 42]
         iconAnchor: [21, 21]
         popupAnchor: [0, -25]
@@ -89,8 +89,9 @@ updateHistory = ->
 rotateIcons = ->
   historyLayer.eachLayer (layer) ->
     if layer._heading?
-      trans = $(layer._icon).css '-webkit-transform'
-      $(layer._icon).css '-webkit-transform', "#{trans} rotate(#{layer._heading}deg)"
+      icon = $(layer._icon)
+      icon.css '-webkit-transform',
+        "#{icon.css '-webkit-transform'} rotate(#{layer._heading}deg)"
 
 map = L.map 'map'
 L.tileLayer('http://{s}.tile.cloudmade.com/4e8589a3643448ff8f36c1def19fbd8c/997/256/{z}/{x}/{y}.png', {
@@ -109,3 +110,5 @@ geolocation (position) ->
 getFrom = new Date()
 getFrom.setHours 0,0,0,0
 getGeos {created: {$gt: getFrom}}, (geoJson) -> addGeoms geoJson.features
+
+$('#start-position').removeClass('nodisplay') if location.hash is '#tracking'

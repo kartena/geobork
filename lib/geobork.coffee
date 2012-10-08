@@ -48,7 +48,6 @@ app.get '/geo/:id', (req, res, next) ->
 app.get '/geo', (req, res, next) ->
   parts = url.parse req.url, true
   query = JSON.parse(parts.query.q) if parts.query.q?
-  console.log '!!!querying db with!!!', query
   controller.getGeos query, (err, geos) ->
     return next(err) if err?
     res.end JSON.stringify map.docsToGeoJson geos

@@ -27,13 +27,10 @@
 <body>
   <div id="map"></div>
   <div id="panel">
-    <div class="not-supported-msg">
-      Your browser does not support the Geolocation API.
-    </div>
-    <a id="start-position" class="big-button" href="#">
+    <div id="start-position" class="big-button nodisplay">
       Start logging as
       <input id="device-name" type="text" />
-    </a>
+    </div>
   </div>
   <script src="socket.io/socket.io.js"></script>
   <script src="js/zepto.js"></script>

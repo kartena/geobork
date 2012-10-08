@@ -100,8 +100,7 @@ p, hr {
   right: 0;
 }
 
-a.big-button {
-  display: none;
+.big-button {
   border-radius: 8px;
   border-bottom: solid 1px #416C96;
   background-color: #568EC7;
@@ -118,12 +117,12 @@ a.big-button {
   box-shadow: 0px 2px 6px -5px black;
 }
 
-a.big-button:hover {
+.big-button:hover {
   bottom: 2px;
   box-shadow: 0px 2px 18px -5px black;
 }
 
-a.big-button:active {
+.big-button:active {
   box-shadow: 0px 2px 6px -5px black;
   bottom: 0px;
 }
@@ -131,14 +130,6 @@ a.big-button:active {
 .big-button input[type=text] {
   width: 100%;
   box-sizing: border-box;
-}
-
-.geolocation .not-supported-msg {
-  display: none;
-}
-
-.geolocation a.big-button {
-  display: block;
 }
 
 /*
