@@ -6,8 +6,9 @@ comparePosition = (p1, p2) ->
           lng1.toFixed(4) is lng2.toFixed(4))
 onPosition = ->
 _geolocation = (callback) ->
-  navigator.geolocation.getCurrentPosition callback, (err) ->
-    console.error "Error when retrieving location '#{err.message}'."
+  if tracking
+    navigator.geolocation.getCurrentPosition callback, (err) ->
+      console.error "Error when retrieving location '#{err.message}'."
 geolocation = (callback) ->
   if lastPosition? then callback lastPosition else _geolocation callback
 cachePosition = ->
@@ -15,26 +16,27 @@ cachePosition = ->
     lastPosition = position
     onPosition(position)
 
-deviceName = localStorage.getItem 'device-name'
-$('#device-name').val deviceName if deviceName?
-
 socket = io.connect '/'
 socket.on 'new geo', (geoJson) ->
   console.log "Got geo from car.", geoJson
   addGeoms geoJson
 
+tracking = no
+deviceName = localStorage.getItem 'device-name'
+$('#device-name').val deviceName if deviceName?
+
+cacheInterval = null
 login = (name) ->
   deviceName = name
   localStorage.setItem 'device-name', name
-loggedIn = -> not not deviceName
+  tracking = yes
+  # Start position tracking
+  cachePosition()
+  cacheInterval = setInterval cachePosition, 5000
+loggedIn = -> (not not deviceName) and tracking
 
-cacheInterval = null
 $('#start-position').click -> login $('#device-name').val()
-$('#stop-position').click -> #clearInterval cacheInterval
-
-# Start position tracking
-cachePosition()
-cacheInterval = setInterval cachePosition, 5000
+$('#start-position input[type=text]').click (e) -> e.stopPropagation()
 
 lastSentPosition = null
 onPosition = (position) ->
@@ -105,13 +107,15 @@ map.on 'zoomend', -> rotateIcons()
 lineLayer = L.layerGroup()
 pointLayer = L.layerGroup().addTo map
 
-geolocation (position) ->
-  {latitude:lat, longitude:lng} = position.coords
-  map.setView [lat, lng], 13
+#geolocation (position) ->
+#  {latitude:lat, longitude:lng} = position.coords
+#  map.setView [lat, lng], 13
 
 # Get all logged positions for the day
 getFrom = new Date()
 getFrom.setHours 0,0,0,0
-getGeos {created: {$gt: getFrom}}, (geoJson) -> addGeoms geoJson.features
+getGeos {created: {$gt: getFrom}}, (geoJson) ->
+  addGeoms geoJson.features
+  map.fitBounds new L.LatLngBounds(line._point.getLatLng() for name, line of history)
 
 $('#start-position').removeClass('nodisplay') if location.hash is '#tracking'
