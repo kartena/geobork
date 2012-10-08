@@ -45,16 +45,18 @@ onPosition = (position) ->
         type: 'Point'
         coordinates: [lng, lat]
       properties:
-        car: 'First car'
         name: deviceName
+        accuracy: position.accuracy
+        heading: position.heading
+        hdop: -1
+        web: true
     lastSentPosition = position
 
 getGeos = (query, callback) ->
   $.ajax
     type: 'GET'
     url: '/geo'
-    data:
-      q: JSON.stringify query
+    data: {q: JSON.stringify query}
     success: (json, status, xhr) -> callback JSON.parse json
 
 history = {}
@@ -63,7 +65,7 @@ addGeoms = (features) ->
   for f in features
     {geometry:{coordinates}, properties} = f
     line = (history[properties.name] or
-            (history[properties.name] = L.polyline([]).addTo historyLayer))
+            (history[properties.name] = L.polyline([]).addTo lineLayer))
     line.addLatLng new L.LatLng(coordinates[1], coordinates[0])
     line.lastFeature = f
   updateHistory()
@@ -79,7 +81,7 @@ updateHistory = ->
         iconSize: [42, 42]
         iconAnchor: [21, 21]
         popupAnchor: [0, -25]
-      line._point = L.marker(lastLatLng, {icon}).addTo historyLayer
+      line._point = L.marker(lastLatLng, {icon}).addTo pointLayer
     p = line._point
     p.setLatLng lastLatLng
     p.bindPopup "#{name}<br>#{meta._created}"
@@ -87,7 +89,7 @@ updateHistory = ->
   rotateIcons()
 
 rotateIcons = ->
-  historyLayer.eachLayer (layer) ->
+  lineLayer.eachLayer (layer) ->
     if layer._heading?
       icon = $(layer._icon)
       icon.css '-webkit-transform',
@@ -100,7 +102,8 @@ L.tileLayer('http://{s}.tile.cloudmade.com/4e8589a3643448ff8f36c1def19fbd8c/997/
 }).addTo map
 map.on 'zoomend', -> rotateIcons()
 
-historyLayer = L.layerGroup().addTo map
+lineLayer = L.layerGroup()
+pointLayer = L.layerGroup().addTo map
 
 geolocation (position) ->
   {latitude:lat, longitude:lng} = position.coords
