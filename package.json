@@ -9,8 +9,8 @@
   }
   ,"dependencies": {
     "mongoose": "*"
-    ,"connect": "*"
-    ,"coffee-script": "*"
+    ,"express": "~3.0"
+    ,"coffee-script": "~1.3"
   }
   ,"engines": {
     "node": "~0.8"

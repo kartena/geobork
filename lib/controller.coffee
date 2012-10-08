@@ -9,4 +9,4 @@ exports.getGeo = (id, callback) ->
   Geo.findById id, callback
 
 exports.getGeos = (callback, max) ->
-  Geo.find().sort({created: -1}).limit(20).exec callback
+  Geo.find().sort({created: 1}).exec callback

@@ -20,14 +20,25 @@ if deviceId?
   deviceName = localStorage.getItem 'device-name'
   $('#device-name').val deviceName
 
+geos = {}
 devices = {}
-loggedIn = -> return (devices[deviceId]?)
+loggedIn = -> return devices[deviceId]?
+addGeo = (geo) ->
+  dId = geo.properties.by
+  geos[dId] = [] if not geos[dId]?
+  geos[dId].push geo
+  L.marker(geo.geometry.coordinates.reverse()).addTo map
+addGeos = (geos_) ->
+  geos_ = [geos_] if not (geos_ instanceof Array)
+  addGeo(g) for g in geos_
 
 socket = io.connect '/'
 socket.on 'geos', (geoJson) ->
   console.log "Got geos.", geoJson
+  addGeos geoJson.features
 socket.on 'new geo', (geoJson) ->
   console.log "Got geo from car.", geoJson
+  addGeos geoJson
 socket.on 'new device', (ident) ->
   console.log "Got ident.", ident
   devices[ident.deviceId] = ident.name
@@ -60,13 +71,13 @@ onPosition = (position) ->
           car: 'First car'
     lastSentPosition = position
 
-map = L.map('map')
+map = L.map 'map'
 L.tileLayer('http://{s}.tile.cloudmade.com/4e8589a3643448ff8f36c1def19fbd8c/997/256/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-    maxZoom: 18
+  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+  maxZoom: 18
 }).addTo map
 
 geolocation (position) ->
   {latitude:lat, longitude:lng} = position.coords
   map.setView [lat, lng], 13
-  marker = L.marker([lat, lng]).addTo(map)
+  marker = L.marker([lat, lng]).addTo map

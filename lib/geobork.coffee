@@ -45,8 +45,8 @@ app.use '/geo', (req, res, next) ->
 devices = {}
 
 io.sockets.on 'connection', (socket) ->
-  console.log 'new client connected'
-  socket.on 'login', (ident) ->
+  socket.on 'new geo', (geoJson) ->
+    console.log 'new geo from client!'
     console.log 'client logging in'
     if devices[ident.deviceId]?
       socket.disconnect()
@@ -56,8 +56,6 @@ io.sockets.on 'connection', (socket) ->
       # Send all stored geos
       controller.getGeos (err, geos) ->
         socket.emit 'geos', map.docsToGeoJson geos
-  socket.on 'new geo', (geoJson) ->
-    console.log 'new geo from client!'
     socket.get 'deviceId', (err, deviceId) ->
       geoJson.properties.by = deviceId
       socket.broadcast.emit 'new geo', geoJson
