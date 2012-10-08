@@ -19,6 +19,6 @@
   ,"files": ["server.js", "js/", "LICENSE", "README.md"]
   ,"scripts": {
     "install": "node node_modules/coffee-script/bin/coffee -c -o js lib && node node_modules/coffee-script/bin/coffee -c client"
-    "watch": "node node_modules/coffee-script/bin/coffee -cw -o js lib & node node_modules/coffee-script/bin/coffee -cw client"
+    , "watch": "node node_modules/coffee-script/bin/coffee -cw -o js lib & node node_modules/coffee-script/bin/coffee -cw client"
   }
 }
