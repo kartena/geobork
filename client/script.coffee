@@ -59,7 +59,9 @@ getGeos = (query, callback) ->
   $.ajax
     type: 'GET'
     url: '/geo'
-    data: {q: JSON.stringify query}
+    data:
+      q: JSON.stringify query
+      sort: JSON.stringify 'meta.timestamp'
     success: (json, status, xhr) -> callback JSON.parse json
 
 history = {}
