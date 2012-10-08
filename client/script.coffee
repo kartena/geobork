@@ -91,7 +91,7 @@ updateHistory = ->
   rotateIcons()
 
 rotateIcons = ->
-  lineLayer.eachLayer (layer) ->
+  pointLayer.eachLayer (layer) ->
     if layer._heading?
       icon = $(layer._icon)
       icon.css '-webkit-transform',
