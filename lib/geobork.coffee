@@ -1,12 +1,9 @@
 http = require 'http'
+url = require 'url'
 express = require 'express'
+
 controller = require './controller'
 map = require './mapping'
-
-collect = (req, callback) ->
-  data = ''
-  req.on 'data', (d) -> data += d
-  req.on 'end', -> callback data
 
 # Setup web server express+socket.io
 app = express()
@@ -32,34 +29,34 @@ app.put '/geo', (req, res, next) ->
     io.sockets.emit 'new geo', geoJson
     res.end()
 
-app.use '/geo/:id', (req, res, next) ->
+app.get '/geo_put*', (req, res, next) ->
+  parts = url.parse req.url, true
+  {lat, lng} = parts.query
+  delete parts.query.lat
+  delete parts.query.lng
+  doc = {loc:[lng, lat], meta:parts.query}
+  controller.createGeo doc, (err, doc) ->
+    return next(err) if err?
+    io.sockets.emit 'new geo', map.docToGeoJson(doc)
+    res.end()
+
+app.get '/geo/:id', (req, res, next) ->
   controller.getGeo req.params.id, (err, geo) ->
     return next(err) if err?
     res.end JSON.stringify map.docToGeoJson geo
 
-app.use '/geo', (req, res, next) ->
-  controller.getGeos (err, geos) ->
+app.get '/geo', (req, res, next) ->
+  parts = url.parse req.url, true
+  query = JSON.parse(parts.query.q) if parts.query.q?
+  console.log '!!!querying db with!!!', query
+  controller.getGeos query, (err, geos) ->
     return next(err) if err?
     res.end JSON.stringify map.docsToGeoJson geos
 
-devices = {}
-
 io.sockets.on 'connection', (socket) ->
   socket.on 'new geo', (geoJson) ->
-    console.log 'new geo from client!'
-    console.log 'client logging in'
-    if devices[ident.deviceId]?
-      socket.disconnect()
-      return
-    socket.set 'deviceId', ident.deviceId, ->
-      io.sockets.emit 'new device', ident
-      # Send all stored geos
-      controller.getGeos (err, geos) ->
-        socket.emit 'geos', map.docsToGeoJson geos
-    socket.get 'deviceId', (err, deviceId) ->
-      geoJson.properties.by = deviceId
-      socket.broadcast.emit 'new geo', geoJson
-      controller.createGeo map.geoJsonToDoc(geoJson)
+    controller.createGeo map.geoJsonToDoc(geoJson), (err, doc) ->
+      socket.broadcast.emit 'new geo', map.docToGeoJson(doc)
 
 server.listen 8013
 process.on 'exit', -> server.close()

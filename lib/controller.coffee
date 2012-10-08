@@ -8,5 +8,5 @@ exports.createGeo = (geo, callback) ->
 exports.getGeo = (id, callback) ->
   Geo.findById id, callback
 
-exports.getGeos = (callback, max) ->
-  Geo.find().sort({created: 1}).exec callback
+exports.getGeos = (q, callback) ->
+  Geo.find(q).sort({created: 1}).exec callback
