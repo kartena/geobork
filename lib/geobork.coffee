@@ -29,7 +29,7 @@ app.put '/geo', (req, res, next) ->
     io.sockets.emit 'new geo', geoJson
     res.end()
 
-app.get '/geo_put*', (req, res, next) ->
+app.get '/geo_put', (req, res, next) ->
   parts = url.parse req.url, true
   {lat, lng} = parts.query
   delete parts.query.lat
@@ -47,10 +47,12 @@ app.get '/geo/:id', (req, res, next) ->
 
 app.get '/geo', (req, res, next) ->
   parts = url.parse req.url, true
-  query = JSON.parse(parts.query.q) if parts.query.q?
-  controller.getGeos query, (err, geos) ->
+  find = JSON.parse(parts.query.q) if parts.query.q?
+  sort = JSON.parse(parts.query.sort) if parts.query.sort?
+  controller.getGeos (err, geos) ->
     return next(err) if err?
     res.end JSON.stringify map.docsToGeoJson geos
+  ,{find, sort}
 
 io.sockets.on 'connection', (socket) ->
   socket.on 'new geo', (geoJson) ->
