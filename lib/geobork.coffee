@@ -38,10 +38,13 @@ app.put '/geo', (req, res, next) ->
 
 app.get '/geo_put', (req, res, next) ->
   parts = url.parse req.url, true
-  meta = {}
-  meta[k] = cohers(v) for k, v of parts.query when not (k in ['lat','lng'])
-  {lat, lng} = parts.query
-  doc = {loc:[parseFloat(lng), parseFloat(lat)], meta}
+  if parts.query.json?
+    doc = map.geoJsonToDoc JSON.parse parts.query.json
+  else
+    meta = {}
+    meta[k] = cohers(v) for k, v of parts.query when not (k in ['lat','lng'])
+    {lat, lng} = parts.query
+    doc = { loc: [ parseFloat(lng), parseFloat(lat) ], meta }
   controller.createGeo doc, (err, doc) ->
     return next(err) if err?
     io.sockets.emit 'new geo', map.docToGeoJson(doc)
