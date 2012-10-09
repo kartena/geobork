@@ -5,6 +5,13 @@ express = require 'express'
 controller = require './controller'
 map = require './mapping'
 
+cohers = (v) ->
+  return Number(v) if not Number.isNaN(Number v)
+  return true if v is "true"
+  return false if v is "false"
+  return new Date(v) if not Number.isNaN(Date.parse v)
+  return v
+
 # Setup web server express+socket.io
 app = express()
 server = http.createServer app
@@ -31,10 +38,10 @@ app.put '/geo', (req, res, next) ->
 
 app.get '/geo_put', (req, res, next) ->
   parts = url.parse req.url, true
+  meta = {}
+  meta[k] = cohers(v) for k, v of parts.query when not (k in ['lat','lng'])
   {lat, lng} = parts.query
-  delete parts.query.lat
-  delete parts.query.lng
-  doc = {loc:[lng, lat], meta:parts.query}
+  doc = {loc:[parseFloat(lng), parseFloat(lat)], meta}
   controller.createGeo doc, (err, doc) ->
     return next(err) if err?
     io.sockets.emit 'new geo', map.docToGeoJson(doc)
