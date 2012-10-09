@@ -6,9 +6,8 @@ comparePosition = (p1, p2) ->
           lng1.toFixed(4) is lng2.toFixed(4))
 onPosition = ->
 _geolocation = (callback) ->
-  if tracking
-    navigator.geolocation.getCurrentPosition callback, (err) ->
-      console.error "Error when retrieving location '#{err.message}'."
+  navigator.geolocation.getCurrentPosition callback, (err) ->
+    console.error "Error when retrieving location '#{err.message}'."
 geolocation = (callback) ->
   if lastPosition? then callback lastPosition else _geolocation callback
 cachePosition = ->
@@ -17,9 +16,7 @@ cachePosition = ->
     onPosition(position)
 
 socket = io.connect '/'
-socket.on 'new geo', (geoJson) ->
-  console.log "Got geo from car.", geoJson
-  addGeoms geoJson
+socket.on 'new geo', (geoJson) -> addGeoms geoJson
 
 tracking = no
 deviceName = localStorage.getItem 'device-name'
@@ -42,7 +39,7 @@ lastSentPosition = null
 onPosition = (position) ->
   if loggedIn() and not comparePosition(lastSentPosition, position)
     {latitude:lat, longitude:lng} = position.coords
-    socket.emit 'new geo',
+    geoJson =
       geometry:
         type: 'Point'
         coordinates: [lng, lat]
@@ -53,7 +50,9 @@ onPosition = (position) ->
         timestamp: Date.now()
         hdop: -1
         web: true
+    socket.emit 'new geo', geoJson
     lastSentPosition = position
+    addGeoms geoJson
 
 getGeos = (query, callback) ->
   $.ajax
@@ -110,15 +109,16 @@ map.on 'zoomend', -> rotateIcons()
 lineLayer = L.layerGroup()
 pointLayer = L.layerGroup().addTo map
 
-#geolocation (position) ->
-#  {latitude:lat, longitude:lng} = position.coords
-#  map.setView [lat, lng], 13
-
 # Get all logged positions for the day
 getFrom = new Date()
 getFrom.setHours 0,0,0,0
 getGeos {created: {$gt: getFrom}}, (geoJson) ->
   addGeoms geoJson.features
-  map.fitBounds new L.LatLngBounds(line._point.getLatLng() for name, line of history)
+  try
+    map.fitBounds new L.LatLngBounds(line._point.getLatLng() for name, line of history)
+  catch err
+    geolocation (position) ->
+      {latitude:lat, longitude:lng} = position.coords
+      map.setView [lat, lng], 13
 
 $('#start-position').removeClass('nodisplay') if location.hash is '#tracking'
