@@ -5,6 +5,9 @@ express = require 'express'
 controller = require './controller'
 map = require './mapping'
 
+argPort = parseInt(process.argv[2])
+argStaticPath = process.argv[3]
+
 cohers = (v) ->
   return Number(v) if not Number.isNaN(Number v)
   return true if v is "true"
@@ -21,7 +24,7 @@ app.use express.bodyParser()
 
 # TODO: move to configuration
 app.use express.logger 'dev'
-app.use express.static process.argv[3] or 'client'
+app.use express.static argStaticPath if argStaticPath?
 
 app.use '/geo*', (req, res, next) ->
   res.header 'Access-Control-Allow-Origin', '*'
@@ -29,45 +32,49 @@ app.use '/geo*', (req, res, next) ->
   next()
 # end
 
-app.put '/geo', (req, res, next) ->
-  geoJson = req.body
-  controller.createGeo map.geoJsonToDoc(geoJson), (err) ->
+newGeo = (getDoc, req, res, next) ->
+  controller.createGeo getDoc(req), (err, doc) ->
     return next(err) if err?
-    io.sockets.emit 'new geo', geoJson
+    io.sockets.emit 'new geo', map.docToGeo(doc)
     res.end()
-
-app.get '/geo_put', (req, res, next) ->
+app.put '/geo', newGeo.bind undefined, (req) -> map.geoToDoc req.body
+app.put '/geojson', newGeo.bind undefined, (req) -> map.geoJsonToDoc req.body
+app.get '/put_geo', newGeo.bind undefined, (req) ->
   parts = url.parse req.url, true
-  if parts.query.json?
-    doc = map.geoJsonToDoc JSON.parse parts.query.json
-  else
-    meta = {}
-    meta[k] = cohers(v) for k, v of parts.query when not (k in ['lat','lng'])
-    {lat, lng} = parts.query
-    doc = { loc: [ parseFloat(lng), parseFloat(lat) ], meta }
-  controller.createGeo doc, (err, doc) ->
-    return next(err) if err?
-    io.sockets.emit 'new geo', map.docToGeoJson(doc)
-    res.end()
+  map.geoToDoc JSON.parse parts.query.json
+app.get '/put_geojson', newGeo.bind undefined, (req) ->
+  parts = url.parse req.url, true
+  map.geoJsonToDoc JSON.parse parts.query.json
+app.get '/put_params', newGeo.bind undefined, (req) ->
+  parts = url.parse req.url, true
+  meta = {}
+  meta[k] = cohers(v) for k, v of parts.query when not (k in ['lat','lng'])
+  { lat, lng } = parts.query
+  { lnglat: [ parseFloat(lng), parseFloat(lat) ], meta }
 
-app.get '/geo/:id', (req, res, next) ->
-  controller.getGeo req.params.id, (err, geo) ->
+idGeo = (convert, req, res, next) ->
+  controller.getGeo req.params.id, (err, doc) ->
     return next(err) if err?
-    res.end JSON.stringify map.docToGeoJson geo
+    res.json converter doc
+app.get '/geo/:id', idGeo.bind undefined, map.docToGeo
+app.get '/geojson/:id', idGeo.bind undefined, map.docToGeoJson
 
-app.get '/geo', (req, res, next) ->
+queryGeos = (convert, req, res, next) ->
   parts = url.parse req.url, true
   find = JSON.parse(parts.query.q) if parts.query.q?
   sort = JSON.parse(parts.query.sort) if parts.query.sort?
   controller.getGeos (err, geos) ->
     return next(err) if err?
-    res.end JSON.stringify map.docsToGeoJson geos
+    res.json convert geos
   ,{find, sort}
+app.get '/geo', queryGeos.bind undefined, (docs) ->
+  map.docToGeo doc for doc in docs
+app.get '/geojson', queryGeos.bind undefined, map.docsToGeoJson
 
 io.sockets.on 'connection', (socket) ->
-  socket.on 'new geo', (geoJson) ->
-    controller.createGeo map.geoJsonToDoc(geoJson), (err, doc) ->
-      socket.broadcast.emit 'new geo', map.docToGeoJson(doc)
+  socket.on 'new geo', (geo) ->
+    controller.createGeo map.geoToDoc(geo), (err, doc) ->
+      socket.broadcast.emit 'new geo', map.docToGeo(doc)
 
-server.listen parseInt(process.argv[2] or 8013)
+server.listen argPort or 8013
 process.on 'exit', -> server.close()

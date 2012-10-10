@@ -1,5 +1,5 @@
 exports.geoJsonToDoc = (geoJson) ->
-  loc: geoJson.geometry.coordinates
+  lnglat: geoJson.geometry.coordinates
   meta: geoJson.properties
 
 exports.docToGeoJson = docToGeoJson = (doc) ->
@@ -7,9 +7,18 @@ exports.docToGeoJson = docToGeoJson = (doc) ->
   type: 'Feature'
   geometry:
     type: 'Point'
-    coordinates: doc.loc
+    coordinates: doc.lnglat
   properties: doc.meta
 
 exports.docsToGeoJson = (docs) ->
   type: 'FeatureCollection'
   features: (docToGeoJson doc for doc in docs)
+
+exports.docToGeo = (doc) ->
+  lnglat: doc.lnglat
+  meta: doc.meta
+  created: doc.created
+
+exports.geoToDoc = (geo) ->
+  lnglat: geo.lnglat
+  meta: geo.meta
