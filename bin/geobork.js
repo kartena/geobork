@@ -14,7 +14,7 @@ io = geobork.socketio(server);
 
 // Forward new geos from http to sockets
 app.controller.on('new geo', function (json) {
-  io.socket.emit('new geo', json);
+  io.sockets.emit('new geo', json);
 });
 
 // configuration

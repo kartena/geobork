@@ -7,7 +7,7 @@ class Controller extends EventEmitter
   # Put multiple geos
   newGeos: (docs, res, next) ->
     console.log docs
-    db.createGeos docs, (errs, docs) ->
+    db.createGeos docs, (errs, docs) =>
       return next(errs) if errs?
       #io.sockets.emit('new geo', map.docToGeo(doc)) for doc in docs
       @emit('new geo', map.docToGeo(doc)) for doc in docs
@@ -16,7 +16,7 @@ class Controller extends EventEmitter
   # Put single/multi geos
   newGeo: (doc, res, next) ->
     console.log doc
-    db.createGeo doc, (err, doc) ->
+    db.createGeo doc, (err, doc) =>
       return next(err) if err?
       #io.sockets.emit 'new geo', map.docToGeo(doc)
       @emit 'new geo', map.docToGeo(doc)
@@ -30,8 +30,7 @@ class Controller extends EventEmitter
 
   oneOrMoreGeoJson: (json) ->
     if json.type is 'FeatureCollection'
-      @newGeos.bind @,
-        (map.geoJsonToDoc geoJson for geoJson in json.features)
+      @newGeos.bind @, (map.geoJsonToDoc geoJson for geoJson in json.features)
     else
       @newGeo.bind @, map.geoJsonToDoc(json)
 
