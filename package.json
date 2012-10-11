@@ -7,18 +7,28 @@
     "type": "git"
     ,"url": "https://github.com/kartena/geobork.git"
   }
+  ,"licenses": [{
+    "type": "MIT"
+    ,"url": "https://raw.github.com/christopherf/geobork/master/LICENSE"
+  }]
   ,"dependencies": {
     "mongoose": "*"
     ,"express": "~3.0"
-    ,"coffee-script": "~1.3"
     ,"socket.io": "*"
+  }
+  ,"devDependencies": {
+    "coffee-script": "~1.3"
   }
   ,"engines": {
     "node": "~0.8"
   }
-  ,"files": ["server.js", "js/", "LICENSE", "README.md"]
+  ,"main": "js/geobork.js"
+  ,"bin": {
+    "geobork": "bin/geobork.js"
+  }
+  ,"files": ["js/", "bin/", "LICENSE", "README.md"]
   ,"scripts": {
-    "install": "node node_modules/coffee-script/bin/coffee -c -o js lib && node node_modules/coffee-script/bin/coffee -c client"
-    , "watch": "node node_modules/coffee-script/bin/coffee -cw -o js lib & node node_modules/coffee-script/bin/coffee -cw client"
+    "build": "node node_modules/coffee-script/bin/coffee -c -o js lib && node node_modules/coffee-script/bin/coffee -c client"
+    ,"watch": "node node_modules/coffee-script/bin/coffee -cw -o js lib & node node_modules/coffee-script/bin/coffee -cw client"
   }
 }
