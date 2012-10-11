@@ -36,7 +36,7 @@ exports.http = (server) ->
     meta = {}
     meta[k] = cohers(v) for k, v of parts.query when not (k in ['lat','lng'])
     {lat, lng} = parts.query
-    ctrl.newGeo.bind undefined,
+    ctrl.newGeo.bind ctrl,
       lnglat: [parseFloat(lng), parseFloat(lat)]
       meta: meta
 

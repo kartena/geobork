@@ -6,7 +6,6 @@ db = require './db'
 class Controller extends EventEmitter
   # Put multiple geos
   newGeos: (docs, res, next) ->
-    console.log docs
     db.createGeos docs, (errs, docs) =>
       return next(errs) if errs?
       #io.sockets.emit('new geo', map.docToGeo(doc)) for doc in docs
@@ -15,7 +14,6 @@ class Controller extends EventEmitter
 
   # Put single/multi geos
   newGeo: (doc, res, next) ->
-    console.log doc
     db.createGeo doc, (err, doc) =>
       return next(err) if err?
       #io.sockets.emit 'new geo', map.docToGeo(doc)
