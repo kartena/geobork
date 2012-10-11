@@ -5,6 +5,15 @@ Geo = db.model 'Geo', schema.Geo
 exports.createGeo = (geo, callback) ->
   new Geo(geo).save callback
 
+exports.createGeos = (geos, callback) ->
+  result = []
+  errs = undefined
+  for geo in geos
+    new Geo(geo).save (err, doc) ->
+      result.push doc or undefined
+      (if errs? then errs.push(err) else errs = [err]) if err?
+      callback(errs, result) if result.length is geos.length
+
 exports.getGeo = (id, callback) ->
   Geo.findById id, callback
 

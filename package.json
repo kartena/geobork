@@ -22,13 +22,13 @@
   ,"engines": {
     "node": "~0.8"
   }
-  ,"main": "js/geobork.js"
+  ,"main": "lib/geobork.js"
   ,"bin": {
     "geobork": "bin/geobork.js"
   }
-  ,"files": ["js/", "bin/", "LICENSE", "README.md"]
+  ,"files": ["lib/", "bin/", "LICENSE", "README.md"]
   ,"scripts": {
-    "build": "node node_modules/coffee-script/bin/coffee -c -o js lib && node node_modules/coffee-script/bin/coffee -c client"
-    ,"watch": "node node_modules/coffee-script/bin/coffee -cw -o js lib & node node_modules/coffee-script/bin/coffee -cw client"
+    "build": "node node_modules/coffee-script/bin/coffee -c -o lib coffee && node node_modules/coffee-script/bin/coffee -c client"
+    ,"watch": "node node_modules/coffee-script/bin/coffee -cw -o lib coffee & node node_modules/coffee-script/bin/coffee -cw client"
   }
 }
