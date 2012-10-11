@@ -3,7 +3,7 @@ exports.geoJsonToDoc = (geoJson) ->
   meta: geoJson.properties
 
 exports.docToGeoJson = docToGeoJson = (doc) ->
-  doc.meta._created = doc.created
+  doc.meta?._created = doc.created
   type: 'Feature'
   geometry:
     type: 'Point'
