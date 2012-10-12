@@ -48,7 +48,6 @@ exports.http = (app) ->
     map.docToGeo doc for doc in docs
   app.get '/geojson', ctrl.queryGeos.bind ctrl, map.docsToGeoJson
 
-  server.on 'request', app
   return ctrl
 
 exports.socketio = (server) ->
