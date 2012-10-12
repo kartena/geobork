@@ -14,12 +14,11 @@ cohers = (v) ->
 
 resRouter = (getResHandler, req, res, next) -> getResHandler(req) res, next
 
-exports.http = (server) ->
-  # Setup web server
-  app = express()
-  app.use express.bodyParser()
+exports.http = (app) ->
+  ctrl = new Controller
 
-  app.controller = ctrl = new Controller
+  # Setup web server
+  app.use express.bodyParser()
 
   app.put '/geo', resRouter.bind undefined, (req) ->
     ctrl.oneOrMoreGeos req.body
@@ -50,7 +49,7 @@ exports.http = (server) ->
   app.get '/geojson', ctrl.queryGeos.bind ctrl, map.docsToGeoJson
 
   server.on 'request', app
-  return app
+  return ctrl
 
 exports.socketio = (server) ->
   # Socket.io setup

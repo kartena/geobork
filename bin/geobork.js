@@ -6,14 +6,15 @@ var express = require('express'),
     argPort = parseInt(process.argv[2]),
     argWebRoot = process.argv[3],
 
-    server = require('http').createServer(),
-    app, io;
+    app = express(),
+    server = require('http').createServer(app),
+    ctrl, io;
 
-app = geobork.http(server);
+ctrl = geobork.http(app);
 io = geobork.socketio(server);
 
 // Forward new geos from http to sockets
-app.controller.on('new geo', function (json) {
+ctrl.on('new geo', function (json) {
   io.sockets.emit('new geo', json);
 });
 
