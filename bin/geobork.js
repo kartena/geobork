@@ -4,25 +4,19 @@ var express = require('express'),
     geobork = require('../lib/geobork'),
 
     argPort = parseInt(process.argv[2]),
-    argWebRoot = process.argv[3],
+    argDbName = process.argv[3] || 'geobork',
+    argWebRoot = process.argv[4],
 
-    app = express(),
-    server = require('http').createServer(app),
-    ctrl, io;
+    server = require('http').createServer(),
+    app, io;
 
-ctrl = geobork.http(app);
-io = geobork.socketio(server);
-
-// Forward new geos from http to sockets
-ctrl.on('new geo', function (json) {
-  io.sockets.emit('new geo', json);
-});
+servers = geobork(server, 'mongodb://localhost/'+argDbName);
 
 // configuration
-app.use(express.logger('dev'));
-if (argWebRoot) app.use(express.static(argWebRoot));
+servers.express.use(express.logger('dev'));
+if (argWebRoot) servers.express.use(express.static(argWebRoot));
 
-app.use('/geo*', function (req, res, next) {
+servers.express.use('/geo*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   next();
