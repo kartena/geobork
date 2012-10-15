@@ -28,7 +28,7 @@ exports.http = (ctrl, app) ->
     ctrl.oneOrMoreGeos JSON.parse url.parse(req.url, true).json
   app.get '/put_geojson', resRouter.bind undefined, (req) ->
     ctrl.oneOrMoreGeoJson JSON.parse url.parse(req.url, true).json
-  app.get '/put_params', resRouter.bind undefined, (req) ->
+  putParams = resRouter.bind undefined, (req) ->
     parts = url.parse req.url, true
     meta = {}
     meta[k] = cohers(v) for k, v of parts.query when not (k in ['lat','lng'])
@@ -36,6 +36,8 @@ exports.http = (ctrl, app) ->
     ctrl.newGeo.bind ctrl,
       lnglat: [parseFloat(lng), parseFloat(lat)]
       meta: meta
+  app.get '/put_params', putParams
+  app.get '/geo_put', putParams # *depricated* legacy call
 
   # Get geo by id
   app.get '/geo/:id', ctrl.idGeo.bind ctrl, map.docToGeo
