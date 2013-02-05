@@ -36,7 +36,7 @@ class Controller extends EventEmitter
   idGeo: (convert, req, res, next) ->
     @srvc.getGeo req.params.id, (err, doc) ->
       return next(err) if err?
-      res.json converter doc
+      res.jsonp converter doc
 
   # Get multiple geos by query
   queryGeos: (convert, req, res, next) ->
@@ -45,7 +45,7 @@ class Controller extends EventEmitter
     sort = JSON.parse(parts.query.sort) if parts.query.sort?
     @srvc.getGeos (err, geos) ->
       return next(err) if err?
-      res.json convert geos
+      res.jsonp convert geos
     ,{find, sort}
 
 module.exports = Controller

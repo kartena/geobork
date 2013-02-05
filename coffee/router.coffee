@@ -18,15 +18,15 @@ exports.http = (ctrl, app) ->
   # Setup web server
   app.use express.bodyParser()
 
-  app.put '/geo', resRouter.bind undefined, (req) ->
+  app.post '/geo', resRouter.bind undefined, (req) ->
     ctrl.oneOrMoreGeos req.body
-  app.put '/geojson', resRouter.bind undefined, (req) ->
+  app.post '/geojson', resRouter.bind undefined, (req) ->
     ctrl.oneOrMoreGeoJson req.body
 
   # Put using GET
-  app.get '/put_geo', resRouter.bind undefined, (req) ->
-    ctrl.oneOrMoreGeos JSON.parse url.parse(req.url, true).json
-  app.get '/put_geojson', resRouter.bind undefined, (req) ->
+  app.get '/post_geo', resRouter.bind undefined, (req) ->
+    ctrl.oneOrMoreGeos JSON.parse url.parse(req.url, true).query.json
+  app.get '/post_geojson', resRouter.bind undefined, (req) ->
     ctrl.oneOrMoreGeoJson JSON.parse url.parse(req.url, true).json
   putParams = resRouter.bind undefined, (req) ->
     parts = url.parse req.url, true
@@ -36,8 +36,7 @@ exports.http = (ctrl, app) ->
     ctrl.newGeo.bind ctrl,
       lnglat: [parseFloat(lng), parseFloat(lat)]
       meta: meta
-  app.get '/put_params', putParams
-  app.get '/geo_put', putParams # *depricated* legacy call
+  app.get '/post_params', putParams
 
   # Get geo by id
   app.get '/geo/:id', ctrl.idGeo.bind ctrl, map.docToGeo
