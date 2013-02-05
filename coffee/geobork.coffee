@@ -14,3 +14,6 @@ module.exports = (server, dbUrl) ->
   io: io
   webController: ctrl
 
+module.exports.mongoService = service
+module.exports.Controller = Controller
+module.exports.router = router
