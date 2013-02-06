@@ -1,10 +1,10 @@
 service = require './service'
 router = require './router'
-Controller = require './controller'
+controller = require './controller'
 
 module.exports = (server, dbUrl) ->
   srvc = service dbUrl or 'mongodb://localhost/geobork'
-  ctrl = new Controller srvc
+  ctrl = controller srvc
   app = router.http ctrl
   server.on 'request', app
   io = router.socketio srvc, server
@@ -15,5 +15,5 @@ module.exports = (server, dbUrl) ->
   webController: ctrl
 
 module.exports.mongoService = service
-module.exports.Controller = Controller
+module.exports.controller = controller
 module.exports.router = router

@@ -7,6 +7,7 @@ module.exports = (url) ->
 
   createGeo: (geo, callback) ->
     new Geo(geo).save callback
+
   createGeos: (geos, callback) ->
     result = []
     errs = undefined
@@ -15,8 +16,10 @@ module.exports = (url) ->
         result.push doc or undefined
         (if errs? then errs.push(err) else errs = [err]) if err?
         callback(errs, result) if result.length is geos.length
+
   getGeo: (id, callback) ->
     Geo.findById id, callback
+
   getGeos: (callback, opt) ->
     {find, sort} = opt if opt?
     q = Geo.find find

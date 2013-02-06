@@ -2,50 +2,27 @@ url = require 'url'
 express = require 'express'
 
 map = require './mapping'
-Controller = require './controller'
-
-cohers = (v) ->
-  return Number(v) if not Number.isNaN(Number v)
-  return true if v is "true"
-  return false if v is "false"
-  return new Date(v) if not Number.isNaN(Date.parse v)
-  return v
-
-resRouter = (getResHandler, req, res, next) -> getResHandler(req) res, next
 
 exports.http = (ctrl, app) ->
   app ?= express()
   # Setup web server
   app.use express.bodyParser()
 
-  app.post '/geo', resRouter.bind undefined, (req) ->
-    ctrl.oneOrMoreGeos req.body
-  app.post '/geojson', resRouter.bind undefined, (req) ->
-    ctrl.oneOrMoreGeoJson req.body
+  app.post '/geo', ctrl.postGeos
+  app.post '/geojson', ctrl.postGeoJson
 
   # Put using GET
-  app.get '/post_geo', resRouter.bind undefined, (req) ->
-    ctrl.oneOrMoreGeos JSON.parse url.parse(req.url, true).query.json
-  app.get '/post_geojson', resRouter.bind undefined, (req) ->
-    ctrl.oneOrMoreGeoJson JSON.parse url.parse(req.url, true).json
-  putParams = resRouter.bind undefined, (req) ->
-    parts = url.parse req.url, true
-    meta = {}
-    meta[k] = cohers(v) for k, v of parts.query when not (k in ['lat','lng'])
-    {lat, lng} = parts.query
-    ctrl.newGeo.bind ctrl,
-      lnglat: [parseFloat(lng), parseFloat(lat)]
-      meta: meta
-  app.get '/post_params', putParams
+  app.get '/post_geo', ctrl.postGeosByGet
+  app.get '/post_geojson', ctrl.postGeoJsonByGet
+  app.get '/post_params', ctrl.postGeoByGetParam
 
   # Get geo by id
-  app.get '/geo/:id', ctrl.idGeo.bind ctrl, map.docToGeo
-  app.get '/geojson/:id', ctrl.idGeo.bind ctrl, map.docToGeoJson
+  app.get '/geo/:id', ctrl.getGeo
+  app.get '/geojson/:id', ctrl.getGeoJson
 
   # Get multiple geos by query
-  app.get '/geo', ctrl.queryGeos.bind ctrl, (docs) ->
-    map.docToGeo doc for doc in docs
-  app.get '/geojson', ctrl.queryGeos.bind ctrl, map.docsToGeoJson
+  app.get '/geo', ctrl.queryGeo
+  app.get '/geojson', ctrl.queryGeoJson
   return app
 
 exports.socketio = (srvc, server) ->
