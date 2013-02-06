@@ -11,16 +11,16 @@ cohers = (v) ->
 
 module.exports = (srvc) ->
   # Put multiple geos
-  _newGeos = (docs, res, next) ->
-    srvc.createGeos docs, (errs, docs) =>
+  _newGeos = (geos, res, next) ->
+    srvc.createGeos geos, (errs, geos) =>
       return next(errs) if errs?
       #io.sockets.emit('new geo', map.docToGeo(doc)) for doc in docs
       #@emit('new geo', map.docToGeo(doc)) for doc in docs
       res.end()
 
   # Put single/multi geos
-  _newGeo = (doc, res, next) ->
-    srvc.createGeo doc, (err, doc) =>
+  _newGeo = (geo, res, next) ->
+    srvc.createGeo geo, (err, geo) =>
       return next(err) if err?
       #io.sockets.emit 'new geo', map.docToGeo(doc)
       #@emit 'new geo', map.docToGeo(doc)
@@ -29,9 +29,9 @@ module.exports = (srvc) ->
   postGeos = (req, res, next) ->
     json = req.body
     (if json instanceof Array
-      _newGeos.bind undefined, (map.geoToDoc geo for geo in json)
+      _newGeos.bind undefined, json
     else
-      _newGeo.bind undefined, map.geoToDoc(json)
+      _newGeo.bind undefined, json
     ) res, next
 
   # Create geo using GET method, use parameter 'json'
@@ -43,15 +43,15 @@ module.exports = (srvc) ->
     json = req.body
     (if json.type is 'FeatureCollection'
       _newGeos.bind undefined,
-        (map.geoJsonToDoc geoJson for geoJson in json.features)
+        (map.geoJsonToGeo geoJson for geoJson in json.features)
     else
-      _newGeo.bind undefined, map.geoJsonToDoc(json)
+      _newGeo.bind undefined, map.geoJsonToGeo(json)
     ) res, next
 
   # Create geo using GET method and GeoJson, use parameter 'json'
   postGeoJsonByGet = (req, res, next) ->
     req.body = JSON.parse url.parse(req.url, true).query.json
-    createGeoJson req, res, next
+    postGeoJson req, res, next
 
   # Add geo by url parameters, 'lat' and 'lng' for the coordinate the rest of
   # the parameters are considered meta data.
@@ -67,12 +67,12 @@ module.exports = (srvc) ->
 
   # Get geo by id
   _idGeo = (convert, req, res, next) ->
-    srvc.getGeo req.params.id, (err, doc) ->
+    srvc.getGeo req.params.id, (err, geo) ->
       return next(err) if err?
-      res.jsonp converter doc
+      res.jsonp convert geo
 
-  getGeo = _idGeo.bind undefined, map.docToGeo
-  getGeoJson = _idGeo.bind undefined, map.docToGeoJson
+  getGeo = _idGeo.bind undefined, (x) -> x
+  getGeoJson = _idGeo.bind undefined, map.geoToGeoJson
 
   # Get multiple geos by query
   _queryGeos = (convert, req, res, next) ->
@@ -84,9 +84,8 @@ module.exports = (srvc) ->
       res.jsonp convert geos
     ,{find, sort}
 
-  queryGeos = (req, res, next) ->
-    _queryGeos ((docs) -> map.docToGeo doc for doc in docs) ,req, res, next
-  queryGeoJson = _queryGeos.bind undefined, map.docsToGeoJson
+  queryGeos = _queryGeos.bind undefined, (x) -> x
+  queryGeoJson = _queryGeos.bind undefined, map.geosToGeoJson
 
   {
     postGeos, postGeoJson,

@@ -31,6 +31,6 @@ exports.socketio = (srvc, server) ->
 
   io.sockets.on 'connection', (socket) ->
     socket.on 'new geo', (geo) ->
-      srvc.createGeo map.geoToDoc(geo), (err, doc) ->
-        socket.broadcast.emit 'new geo', map.docToGeo(doc)
+      srvc.createGeo geo, (err, geo) ->
+        socket.broadcast.emit 'new geo', geo
   return io
