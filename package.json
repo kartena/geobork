@@ -1,6 +1,6 @@
 {
   "name": "geobork"
-  ,"version": "0.1.0"
+  ,"version": "0.2.0"
   ,"description": "Geo Borker (Broker) is a server for storing locations through a REST API."
   ,"author": "Christopher Fredén <christopher.freden@kartena.se>"
   ,"repository": {
