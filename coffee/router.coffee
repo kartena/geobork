@@ -1,17 +1,20 @@
 url = require 'url'
 express = require 'express'
 
-map = require './mapping'
+controller = require './controller'
 
-exports.http = (ctrl, app) ->
-  app ?= express()
+exports.http = (srvc, app) ->
+  ctrl = controller srvc
+
   # Setup web server
+  app ?= express()
   app.use express.bodyParser()
 
+  # Create geo
   app.post '/geo', ctrl.postGeos
   app.post '/geojson', ctrl.postGeoJson
 
-  # Put using GET
+  # Create geo using GET
   app.get '/post_geo', ctrl.postGeosByGet
   app.get '/post_geojson', ctrl.postGeoJsonByGet
   app.get '/post_params', ctrl.postGeoByGetParam
@@ -21,7 +24,7 @@ exports.http = (ctrl, app) ->
   app.get '/geojson/:id', ctrl.getGeoJson
 
   # Get multiple geos by query
-  app.get '/geo', ctrl.queryGeo
+  app.get '/geo', ctrl.queryGeos
   app.get '/geojson', ctrl.queryGeoJson
   return app
 

@@ -32,7 +32,7 @@ module.exports = (opt) ->
   getGeo: (id, callback) ->
     Geo.findById id, (err, doc) -> callback err, docToGeo doc
 
-  getGeos: (callback, opt) ->
+  getGeos: (opt, callback) ->
     {find, sort, limit} = opt if opt?
     q = Geo.find find
     q = q.sort (if sort? then sort else 'created')

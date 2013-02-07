@@ -1,6 +1,6 @@
-{EventEmitter} = require 'events'
+#{EventEmitter} = require 'events'
 url = require 'url'
-map = require './mapping'
+geojson = require './geojson'
 
 cohers = (v) ->
   return Number(v) if not Number.isNaN(Number v)
@@ -43,9 +43,9 @@ module.exports = (srvc) ->
     json = req.body
     (if json.type is 'FeatureCollection'
       _newGeos.bind undefined,
-        (map.geoJsonToGeo geoJson for geoJson in json.features)
+        (geojson.toGeo geoJson for geoJson in json.features)
     else
-      _newGeo.bind undefined, map.geoJsonToGeo(json)
+      _newGeo.bind undefined, geojson.toGeo(json)
     ) res, next
 
   # Create geo using GET method and GeoJson, use parameter 'json'
@@ -72,7 +72,7 @@ module.exports = (srvc) ->
       res.jsonp convert geo
 
   getGeo = _idGeo.bind undefined, (x) -> x
-  getGeoJson = _idGeo.bind undefined, map.geoToGeoJson
+  getGeoJson = _idGeo.bind undefined, geojson.fromGeo
 
   # Get multiple geos by query
   _queryGeos = (convert, req, res, next) ->
@@ -80,13 +80,12 @@ module.exports = (srvc) ->
     find = JSON.parse(parts.query.q) if parts.query.q?
     sort = JSON.parse(parts.query.sort) if parts.query.sort?
     limit = parseInt(parts.query.limit) if parts.query.limit?
-    srvc.getGeos (err, geos) ->
+    srvc.getGeos {find, sort, limit}, (err, geos) ->
       return next(err) if err?
       res.jsonp convert geos
-    ,{find, sort, limit}
 
   queryGeos = _queryGeos.bind undefined, (x) -> x
-  queryGeoJson = _queryGeos.bind undefined, map.geosToGeoJson
+  queryGeoJson = _queryGeos.bind undefined, geojson.fromGeos
 
   {
     postGeos, postGeoJson,
