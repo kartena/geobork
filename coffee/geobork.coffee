@@ -1,7 +1,8 @@
 service = require './service'
 router = require './router'
 
-exps =
+# Modules to export as geobork properties
+pub =
   mongoService: service
   controller: require './controller'
   router: router
@@ -15,6 +16,7 @@ module.exports = (opt) ->
   if opt.log then app.use express.logger 'dev'
   if opt.webRoot? then app.use express.static opt.webRoot
 
+  # Allow CORS
   app.use '/geo*', (req, res, next) ->
     res.header 'Access-Control-Allow-Origin', '*'
     res.header 'Access-Control-Allow-Headers', 'X-Requested-With'
@@ -24,4 +26,4 @@ module.exports = (opt) ->
   ## Forward new geos from service layer to sockets
   ##srvc.on 'new geo', (geo) -> io.sockets.emit 'new geo', geo
 
-module.exports[k] = v for k, v in exps
+module.exports[k] = v for k, v of pub
