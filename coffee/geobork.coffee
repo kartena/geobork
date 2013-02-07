@@ -17,3 +17,4 @@ module.exports = (server, dbUrl) ->
 module.exports.mongoService = service
 module.exports.controller = controller
 module.exports.router = router
+module.exports.mapping = require './mapping'

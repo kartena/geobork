@@ -1,12 +1,21 @@
 exports.geoJsonToGeo = (geoJson) ->
-  lnglat: geoJson.geometry.coordinates
+  if geoJson.geometry.type is 'MultiLineString'
+    throw 'Geometry type MultiLineString is not supported.'
+  type: geoJson.geometry.type
+  lnglats: geoJson.geometry.coordinates
   meta: geoJson.properties
+
+exports.geoJsonMultiLineStringToGeos = (geoJson) ->
+  for coordinates in geoJson.geometry.coordinates
+    type: geoJson.geometry.type
+    lnglats: coordinates
+    meta: geoJson.properties
 
 exports.geoToGeoJson = geoToGeoJson = (geo) ->
   type: 'Feature'
   geometry:
-    type: 'Point'
-    coordinates: geo.lnglat
+    type: geo.type or 'Point'
+    coordinates: geo.lnglats
   properties: geo.meta
 
 exports.geosToGeoJson = (geos) ->

@@ -79,10 +79,11 @@ module.exports = (srvc) ->
     parts = url.parse req.url, true
     find = JSON.parse(parts.query.q) if parts.query.q?
     sort = JSON.parse(parts.query.sort) if parts.query.sort?
+    limit = parseInt(parts.query.limit) if parts.query.limit?
     srvc.getGeos (err, geos) ->
       return next(err) if err?
       res.jsonp convert geos
-    ,{find, sort}
+    ,{find, sort, limit}
 
   queryGeos = _queryGeos.bind undefined, (x) -> x
   queryGeoJson = _queryGeos.bind undefined, map.geosToGeoJson
