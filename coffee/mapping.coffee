@@ -7,7 +7,7 @@ exports.geoJsonToGeo = (geoJson) ->
 
 exports.geoJsonMultiLineStringToGeos = (geoJson) ->
   for coordinates in geoJson.geometry.coordinates
-    type: geoJson.geometry.type
+    type: 'LineString'
     lnglats: coordinates
     meta: geoJson.properties
 

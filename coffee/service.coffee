@@ -7,8 +7,14 @@ GeoSchema = new mongoose.Schema
   meta: {}
 
 module.exports = (opt) ->
-  db = if opt.db? then opt.db else mongoose.connect opt.url
-  Geo = db.model (opt.collectionName or 'Geo'), GeoSchema
+  if typeof opt is 'string'
+    url = opt
+  else
+    {url, db, collectionName} = opt
+
+  db ?= mongoose.connect url
+  collectionName ?= 'geo'
+  Geo = db.model collectionName, GeoSchema
 
   db: db
   createGeo: (geo, callback) ->
