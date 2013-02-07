@@ -7,16 +7,16 @@ var express = require('express'),
     argDbName = process.argv[3] || 'geobork',
     argWebRoot = process.argv[4],
 
-    server = require('http').createServer(),
-    app, io;
+    srvc, app;
 
-servers = geobork(server, 'mongodb://localhost/'+argDbName);
+srvc = geobork.mongoService('mongodb://localhost/'+argDbName);
+app = geobork.router.http(srvc);
 
 // configuration
-servers.express.use(express.logger('dev'));
-if (argWebRoot) servers.express.use(express.static(argWebRoot));
+app.use(express.logger('dev'));
+if (argWebRoot) app.use(express.static(argWebRoot));
 
-servers.express.use('/geo*', function (req, res, next) {
+app.use('/geo*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
@@ -24,7 +24,7 @@ servers.express.use('/geo*', function (req, res, next) {
 });
 // end config
 
-server.listen(argPort || 8013);
+app.listen(argPort || 8013);
 
 process.on('exit', function () {
   server.close();
