@@ -1,9 +1,7 @@
-url = require 'url'
-express = require 'express'
-
 controller = require './controller'
 
 exports.http = (srvc, app) ->
+  express = require 'express'
   ctrl = controller srvc
 
   # Setup web server
