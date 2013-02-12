@@ -24,16 +24,20 @@ class MongoService extends EventEmitter
     @Geo = @db.model collectionName, GeoSchema
 
   createGeo: (geo, callback) ->
-    new @Geo(geoToDoc geo).save callback
+    new @Geo(geoToDoc geo).save (err, doc) =>
+      geo = docToGeo doc
+      callback err, geo if callback?
+      @emit 'new geo', geo if not err?
 
   createGeos: (geos, callback) ->
     result = []
     errs = undefined
     for geo in geos
-      new @Geo(geoToDoc geo).save (err, doc) ->
-        result.push (if doc? then docToGeo doc else undefined)
+      new @Geo(geoToDoc geo).save (err, doc) =>
+        geo = result.push (if doc? then docToGeo doc else undefined)
+        @emit 'new geo', geo if not err? and geo?
         (if errs? then errs.push(err) else errs = [err]) if err?
-        callback(errs, result) if result.length is geos.length
+        callback(errs, result) if result.length is geos.length and callback?
 
   getGeo: (id, callback) ->
     @Geo.findById id, (err, doc) -> callback err, docToGeo doc

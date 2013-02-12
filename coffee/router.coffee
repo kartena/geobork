@@ -31,7 +31,8 @@ exports.socketio = (srvc, server) ->
   io = require('socket.io').listen server
 
   io.sockets.on 'connection', (socket) ->
-    socket.on 'new geo', (geo) ->
-      srvc.createGeo geo, (err, geo) ->
-        socket.broadcast.emit 'new geo', geo
+    # Create store geos comming from web clients
+    socket.on 'new geo', (geo) -> srvc.createGeo geo
+  # Forward new geos from service layer to web clients
+  srvc.on 'new geo', (geo) -> io.sockets.emit 'new geo', geo
   return io
