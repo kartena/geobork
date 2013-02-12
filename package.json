@@ -28,7 +28,7 @@
   }
   ,"files": ["lib/", "bin/", "LICENSE", "README.md"]
   ,"scripts": {
-    "build": "node node_modules/coffee-script/bin/coffee -c -o lib coffee && node node_modules/coffee-script/bin/coffee -c client"
-    ,"watch": "node node_modules/coffee-script/bin/coffee -cw -o lib coffee & node node_modules/coffee-script/bin/coffee -cw client"
+    "prepublish": "node_modules/.bin/coffee -c -o lib coffee && node_modules/.bin/coffee -c client"
+    ,"watch": "node_modules/.bin/coffee -cw -o lib coffee & node_modules/.bin/coffee -cw client"
   }
 }
