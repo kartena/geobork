@@ -17,10 +17,10 @@
     ,"socket.io": "*"
   }
   ,"devDependencies": {
-    "coffee-script": "~1.4"
+    "coffee-script": "*"
   }
   ,"engines": {
-    "node": "~0.8"
+    "node": ">=0.8"
   }
   ,"main": "lib/geobork.js"
   ,"bin": {
