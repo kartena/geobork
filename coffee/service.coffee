@@ -4,19 +4,20 @@ mongoose = require 'mongoose'
 
 GeoSchema = new mongoose.Schema
   type: String
-  lnglats: []
+  geometry:
+    type: { type: String }
+    coordinates: []
   created: { type: Date, default: Date.now }
   meta: {}
+GeoSchema.index({ geometry: '2dsphere' });
 
 docToGeo = (doc) ->
-  type: doc.type
-  lnglats: doc.lnglats
+  geometry: doc.geometry
   meta: doc.meta
   created: doc.created
 
 geoToDoc = (geo) ->
-  type: geo.type
-  lnglats: geo.lnglats
+  geometry: geo.geometry
   meta: geo.meta
 
 class MongoService extends EventEmitter
