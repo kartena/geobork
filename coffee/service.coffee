@@ -3,7 +3,6 @@
 mongoose = require 'mongoose'
 
 GeoSchema = new mongoose.Schema
-  type: String
   geometry:
     type: { type: String }
     coordinates: []
@@ -46,8 +45,8 @@ class MongoService extends EventEmitter
   getGeos: (opt, callback) ->
     {find, sort, limit} = opt if opt?
     q = @Geo.find find
-    q = q.sort (if sort? then sort else 'created')
-    if limit? then q = q.limit limit
+    q = q.sort sort if sort?
+    q = q.limit limit if limit?
     q.exec (err, docs) -> callback err, (docToGeo doc for doc in docs)
 
 module.exports = (opt) ->
